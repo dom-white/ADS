@@ -80,10 +80,10 @@ struct AmsConnection : AmsProxy {
     template<class T> long AdsRequest(AmsRequest& request, uint32_t tmms)
     {
         AmsAddr srcAddr;
-        const auto status = router.GetLocalAddress(request.port, &srcAddr);
-        if (status) {
-            return status;
-        }
+        AmsNetId netId = AmsNetId {ownIp};
+        memcpy(&srcAddr.netId, &netId, sizeof(netId));
+        srcAddr.port = request.port;
+
         AmsResponse* response = Write(request.frame, request.destAddr, srcAddr, request.cmdId);
         if (response) {
             if (response->Wait(tmms)) {
